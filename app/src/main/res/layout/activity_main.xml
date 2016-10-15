@@ -9,6 +9,64 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     android:paddingBottom="@dimen/activity_vertical_margin"
+    android:background="@color/fondo"
     tools:context="com.example.sanz11.webservicemaps.MainActivity">
 
+    <TextView
+        android:text="Latitud"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/lati"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+
+    <TextView
+        android:text="Longitud"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/lati"
+        android:layout_marginTop="39dp"
+        android:id="@+id/longg" />
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:inputType="textPersonName"
+        android:ems="10"
+        android:layout_below="@+id/lati"
+        android:background="@color/plaintxt"
+        android:id="@+id/latitu" />
+
+    <EditText
+        android:background="@color/plaintxt"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:inputType="textPersonName"
+        android:ems="10"
+        android:id="@+id/longitu"
+        android:layout_below="@+id/longg"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true" />
+
+    <Button
+        android:text="Obtener datos"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/btn_dato"
+        android:layout_below="@+id/longitu"
+        android:layout_toRightOf="@+id/longg"
+        android:layout_toEndOf="@+id/longg"
+        android:layout_marginLeft="30dp"
+        android:layout_marginStart="30dp"
+        android:layout_marginTop="9dp" />
+
+    <TextView
+        android:text="TextView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/btn_dato"
+        android:layout_marginTop="28dp"
+        android:id="@+id/resultado" />
 </RelativeLayout>

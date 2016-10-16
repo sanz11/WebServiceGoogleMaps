@@ -1,6 +1,5 @@
 package com.example.sanz11.webservicemaps;
 
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -9,13 +8,17 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import com.google.android.gms.appindexing.Action;
 import com.google.android.gms.appindexing.AppIndex;
-import com.google.android.gms.appindexing.Thing;
 import com.google.android.gms.common.api.GoogleApiClient;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
@@ -25,6 +28,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     Button dato;
     EditText longitu, latitu;
     TextView resultado;
+    ObtenerWebService hiloconexion;
     /**
      * ATTENTION: This was auto-generated to implement the App Indexing API.
      * See https://g.co/AppIndexing/AndroidStudio for more information.
@@ -51,7 +55,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.btn_dato:
-
+                hiloconexion=new ObtenerWebService();
+                hiloconexion.execute(latitu.getText().toString(),longitu.getText().toString());
 
                 break;
             default:
@@ -61,17 +66,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
 
-    public class ObtenerWebService extends AsyncTask<String, Integer, Void> {
+    public class ObtenerWebService extends AsyncTask<Object, Object, String> {
 
         @Override
-        protected Void doInBackground(String... params) {
+        protected String doInBackground(Object... params) {
             //aca nos toca conectar con el web service
             String cadena = "http://maps.googleapis.com/maps/api/geocode/json?latlng=";
             cadena= cadena+params[0]+","+params[1]+"&sensor=false";
 
-
+            String devuelve="";
             URL url= null;//dond equeremos obtener info
             //abrimos conneccion a internet
+
             try {
                 url=new URL(cadena);
                 HttpURLConnection connection =(HttpURLConnection) url.openConnection();//abrir la conneccion
@@ -80,10 +86,28 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
                 int respuesta=connection.getResponseCode();
 
-                if(respuesta == HttpURLConnection.HTTP_OK){
-                    BufferedReader lector=new BufferedReader(
-                            new InputStreamReader(connection.getInputStream()));
+                StringBuilder result = new StringBuilder();//
 
+                if(respuesta == HttpURLConnection.HTTP_OK){
+
+                    InputStream in = new BufferedInputStream(connection.getInputStream());//para la cadena de entrada
+
+                    BufferedReader reader=new BufferedReader(
+                            new InputStreamReader(in));
+
+                    String line;
+                    while ((line=reader.readLine()) !=null){
+                       result.append(line);
+                    }
+                    JSONObject respuestaJSON= new JSONObject(result.toString());//creamos el json apartir del stringbuilder
+                    JSONArray resultJSON = respuestaJSON.getJSONArray("results");//results es el nombre del campo JSON
+                    //RECOGEMOS SOLO LOS CAMPOS QUE NOS INTERESAN DEL JSHON EN ESTE CASO EL HIJO DE results
+                    //obtnmos la direccion de los resultados "formatted_address"
+                    String direccion ="Sin datos para esa longitud";
+                    if(resultJSON.length()>0){
+                        direccion=resultJSON.getJSONObject(0).getString("formatted_address");
+                    }//solo nos     uedamos con el primer resultado objeto por eso el array 0 del jsonobjet
+                    devuelve="Direccion: "+ direccion;
 
 
                 }
@@ -92,27 +116,31 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 e.printStackTrace();
             }catch (IOException e){
                 e.printStackTrace();
+            } catch (JSONException e) {
+                e.printStackTrace();
             }
-            return null;
+            return devuelve;
         }
 
         @Override
         protected void onPreExecute() {
-            super.onPreExecute();
+            resultado.setText("");
+           super.onPreExecute();
         }
 
         @Override
-        protected void onPostExecute(Void aVoid) {
-            super.onPostExecute(aVoid);
+        protected void onPostExecute(String aVoid) {
+            resultado.setText(aVoid);
+
         }
 
         @Override
-        protected void onProgressUpdate(Integer... values) {
+        protected void onProgressUpdate(Object... values) {
             super.onProgressUpdate(values);
         }
 
         @Override
-        protected void onCancelled(Void aVoid) {
+        protected void onCancelled(String aVoid) {
             super.onCancelled(aVoid);
         }
     }
